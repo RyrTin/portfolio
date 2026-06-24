@@ -8,34 +8,19 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: #0f172a; color: #e2e8f0; line-height: 1.6;
-    min-height: 100vh;
+    background: #0f172a; color: #e2e8f0; line-height: 1.6; min-height: 100vh;
   }
-
-  /* header */
-  .header {
-    position: sticky; top: 0; z-index: 40;
-    background: rgba(15,23,42,0.95); backdrop-filter: blur(8px);
-    border-bottom: 1px solid #1e293b;
-  }
-  .header-inner {
-    max-width: 1200px; margin: 0 auto; padding: 16px 24px;
-    display: flex; align-items: center; gap: 16px;
-  }
+  .header { position: sticky; top: 0; z-index: 40; background: rgba(15,23,42,0.95); backdrop-filter: blur(8px); border-bottom: 1px solid #1e293b; }
+  .header-inner { max-width: 1200px; margin: 0 auto; padding: 16px 24px; display: flex; align-items: center; gap: 16px; }
   .header a { color: #94a3b8; font-size: 0.875rem; text-decoration: none; transition: color 0.2s; }
   .header a:hover { color: #60a5fa; }
   .header .sep { color: #475569; }
-
-  /* layout */
   .main { max-width: 1200px; margin: 0 auto; padding: 48px 24px; display: flex; gap: 40px; align-items: flex-start; }
 
   /* sidebar */
-  .sidebar {
-    width: 224px; flex-shrink: 0; position: sticky; top: 96px;
-    max-height: calc(100vh - 112px); overflow-y: auto;
-  }
+  .sidebar { width: 224px; flex-shrink: 0; position: sticky; top: 96px; max-height: calc(100vh - 112px); overflow-y: auto; }
   .sidebar-title { font-size: 0.75rem; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; }
-  .sidebar-chapter { margin-bottom: 12px; }
+  .sidebar-ch { margin-bottom: 12px; }
   .sidebar-ch-title {
     display: block; width: 100%; text-align: left; padding: 4px 8px; border-radius: 4px;
     font-size: 0.75rem; font-weight: 600; color: #94a3b8; background: none; border: none;
@@ -43,98 +28,71 @@
   }
   .sidebar-ch-title:hover { color: #e2e8f0; background: rgba(30,41,59,0.5); }
   .sidebar-ch-title.pending { color: #475569; cursor: default; }
-  .sidebar-ch-title .label { font-family: monospace; font-size: 0.65rem; color: #475569; margin-right: 6px; }
-  .sidebar-sub { display: block; width: 100%; text-align: left; padding: 2px 8px 2px 24px; border-radius: 4px;
+  .sidebar-ch-title.active { color: #60a5fa; background: rgba(59,130,246,0.1); }
+  .sidebar-ch-title .label { font-family: monospace; font-size: 0.65rem; margin-right: 6px; }
+  .sidebar-ch-title .label.active-label { color: #3b82f6; }
+  .sidebar-ch-title .label.dim { color: #475569; }
+  .sidebar-sub {
+    display: block; width: 100%; text-align: left; padding: 2px 8px 2px 24px; border-radius: 4px;
     font-size: 0.75rem; color: #64748b; background: none; border: none; cursor: pointer; transition: all 0.15s;
   }
   .sidebar-sub:hover { color: #cbd5e1; background: rgba(30,41,59,0.4); }
   .sidebar-sub.active { color: #60a5fa; background: rgba(59,130,246,0.1); }
 
-  /* content area */
+  /* content */
   .content { flex: 1; min-width: 0; }
   .page-meta { font-family: monospace; font-size: 0.75rem; color: #60a5fa; }
   .page-title { font-size: 1.875rem; font-weight: 700; color: #fff; margin: 4px 0 12px; }
   .page-desc { font-size: 0.875rem; color: #94a3b8; line-height: 1.7; max-width: 560px; }
 
-  /* accordion chapter */
-  .chapter {
-    border: 1px solid #1e293b; border-radius: 12px; margin-bottom: 24px; overflow: hidden;
+  /* chapter tabs */
+  .ch-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
+  .ch-tab {
+    padding: 6px 12px; border-radius: 8px; font-size: 0.75rem; font-weight: 500;
+    background: none; border: 1px solid #1e293b; color: #64748b; cursor: pointer; transition: all 0.15s;
   }
-  .chapter-header {
-    width: 100%; text-align: left; padding: 16px 20px;
-    background: rgba(30,41,59,0.6); border: none; cursor: pointer;
-    display: flex; align-items: center; justify-content: space-between; gap: 12px;
-    transition: background 0.15s;
-  }
-  .chapter-header:hover { background: rgba(30,41,59,0.8); }
-  .chapter-header .ch-label { font-family: monospace; font-size: 0.75rem; color: #64748b; display: block; }
-  .chapter-header .ch-title { font-size: 1rem; font-weight: 600; color: #e2e8f0; }
-  .chapter-header .chevron {
-    width: 20px; height: 20px; color: #64748b; flex-shrink: 0;
-    transition: transform 0.3s;
-  }
-  .chapter-header .chevron.open { transform: rotate(180deg); }
-  .chapter-body {
-    max-height: 0; overflow: hidden; opacity: 0;
-    transition: max-height 0.3s ease, opacity 0.3s ease;
-  }
-  .chapter-body.open { max-height: 9999px; opacity: 1; }
-  .chapter-body-inner { padding: 0 20px 24px; }
+  .ch-tab:hover { color: #cbd5e1; border-color: #334155; }
+  .ch-tab.active { border-color: #1e40af; background: rgba(30,64,175,0.15); color: #93c5fd; }
+  .ch-tab.pending { color: #475569; border-color: #1e293b; cursor: default; }
 
-  /* pending chapter */
-  .chapter-pending {
-    border: 1px solid #1e293b; border-radius: 12px; margin-bottom: 24px; overflow: hidden; opacity: 0.4;
-  }
-  .chapter-pending .chapter-header { cursor: default; }
-  .chapter-pending .chapter-header:hover { background: rgba(30,41,59,0.6); }
-  .chapter-pending .ch-title { color: #64748b; }
-  .chapter-pending .ch-pending-text { padding: 0 20px 20px; font-size: 0.875rem; color: #475569; }
+  /* chapter panel */
+  .ch-panel { display: none; border: 1px solid #1e293b; border-radius: 12px; overflow: hidden; margin-bottom: 24px; }
+  .ch-panel.visible { display: block; }
+  .ch-panel-header { padding: 16px 20px; background: rgba(30,41,59,0.6); }
+  .ch-panel-header .ch-label { font-family: monospace; font-size: 0.75rem; color: #60a5fa; display: block; }
+  .ch-panel-header .ch-title { font-size: 1rem; font-weight: 600; color: #fff; }
+  .ch-panel-body { padding: 0 20px 24px; }
+  .ch-pending { display: none; border: 1px solid #1e293b; border-radius: 12px; overflow: hidden; margin-bottom: 24px; opacity: 0.4; }
+  .ch-pending.visible { display: block; }
+  .ch-pending .ch-panel-header { opacity: 0.6; }
+  .ch-pending-text { padding: 0 20px 20px; font-size: 0.875rem; color: #475569; }
 
   /* typography */
-  .section-h2 {
-    font-size: 1.25rem; font-weight: 700; color: #fff; margin-top: 48px; margin-bottom: 16px;
-    scroll-margin-top: 112px; padding-bottom: 8px; border-bottom: 1px solid #1e293b;
-  }
+  .section-h2 { font-size: 1.25rem; font-weight: 700; color: #fff; margin-top: 48px; margin-bottom: 16px; scroll-margin-top: 112px; padding-bottom: 8px; border-bottom: 1px solid #1e293b; }
   .section-h3 { font-size: 1rem; font-weight: 600; color: #e2e8f0; margin-top: 24px; margin-bottom: 8px; }
   .text-p { font-size: 0.9375rem; color: #94a3b8; line-height: 1.7; margin-bottom: 12px; }
   .text-code { padding: 2px 6px; border-radius: 4px; background: #1e293b; color: #93c5fd; font-size: 0.85em; font-family: monospace; }
-  .pre-block {
-    background: rgba(30,41,59,0.8); border: 1px solid rgba(51,65,85,0.6);
-    border-radius: 8px; padding: 16px; overflow-x: auto;
-    font-size: 0.875rem; font-family: 'Consolas', 'Monaco', monospace;
-    color: #cbd5e1; line-height: 1.6; margin: 16px 0; white-space: pre;
-  }
-  .note-box {
-    background: rgba(30,58,138,0.15); border: 1px solid rgba(30,64,175,0.4);
-    border-radius: 8px; padding: 12px 16px; margin: 16px 0;
-    font-size: 0.875rem; color: #93c5fd; line-height: 1.7;
-  }
-  .warn-box {
-    background: rgba(113,63,18,0.1); border: 1px solid rgba(161,98,7,0.3);
-    border-radius: 8px; padding: 12px 16px; margin: 16px 0;
-    font-size: 0.875rem; color: #fde047; line-height: 1.7;
-  }
-  .list-ul {
-    list-style: disc inside; color: #94a3b8; font-size: 0.9375rem; line-height: 1.7;
-    margin-bottom: 12px; padding-left: 8px;
-  }
+  .pre-block { background: rgba(30,41,59,0.8); border: 1px solid rgba(51,65,85,0.6); border-radius: 8px; padding: 16px; overflow-x: auto; font-size: 0.875rem; font-family: 'Consolas','Monaco',monospace; color: #cbd5e1; line-height: 1.6; margin: 16px 0; white-space: pre; }
+  .note-box { background: rgba(30,58,138,0.15); border: 1px solid rgba(30,64,175,0.4); border-radius: 8px; padding: 12px 16px; margin: 16px 0; font-size: 0.875rem; color: #93c5fd; line-height: 1.7; }
+  .warn-box { background: rgba(113,63,18,0.1); border: 1px solid rgba(161,98,7,0.3); border-radius: 8px; padding: 12px 16px; margin: 16px 0; font-size: 0.875rem; color: #fde047; line-height: 1.7; }
+  .list-ul { list-style: disc inside; color: #94a3b8; font-size: 0.9375rem; line-height: 1.7; margin-bottom: 12px; padding-left: 8px; }
   .list-ul li { margin-bottom: 4px; }
-
   a { color: #60a5fa; text-decoration: none; }
   a:hover { text-decoration: underline; }
 
-  @media (max-width: 1024px) {
-    .sidebar { display: none; }
-  }
-  @media (max-width: 640px) {
-    .main { padding: 32px 16px; }
-    .page-title { font-size: 1.5rem; }
-  }
+  /* prev/next nav */
+  .ch-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 32px; padding-top: 24px; border-top: 1px solid #1e293b; }
+  .ch-nav-btn { color: #94a3b8; font-size: 0.875rem; background: none; border: none; cursor: pointer; transition: color 0.15s; }
+  .ch-nav-btn:hover { color: #e2e8f0; }
+  .ch-nav-btn .nav-label { color: #475569; }
+  .ch-nav-spacer { flex: 1; }
+
+  @media (max-width: 1024px) { .sidebar { display: none; } }
+  @media (max-width: 640px) { .main { padding: 32px 16px; } .page-title { font-size: 1.5rem; } }
 </style>
 </head>
 <body>
 
-<!-- header -->
 <header class="header">
   <div class="header-inner">
     <a href="../../preview.html">← 返回首页</a>
@@ -143,14 +101,13 @@
   </div>
 </header>
 
-<!-- main layout -->
 <div class="main">
   <!-- sidebar -->
   <aside class="sidebar" id="sidebar">
     <p class="sidebar-title">目录</p>
     <nav>
-      <div class="sidebar-chapter">
-        <button class="sidebar-ch-title" data-chapter="wsl2-setup"><span class="label">第一章</span>WSL2 & Ubuntu 开发环境搭建</button>
+      <div class="sidebar-ch">
+        <button class="sidebar-ch-title active" data-chapter="wsl2-setup"><span class="label active-label">第一章</span>WSL2 & Ubuntu 开发环境搭建</button>
         <button class="sidebar-sub active" data-chapter="wsl2-setup" data-section="wsl2-intro">WSL2 是什么、为什么用</button>
         <button class="sidebar-sub" data-chapter="wsl2-setup" data-section="wsl2-install">WSL2 安装</button>
         <button class="sidebar-sub" data-chapter="wsl2-setup" data-section="ubuntu-config">Ubuntu 基础配置</button>
@@ -158,12 +115,12 @@
         <button class="sidebar-sub" data-chapter="wsl2-setup" data-section="dev-tools">开发工具链安装</button>
         <button class="sidebar-sub" data-chapter="wsl2-setup" data-section="wsl2-issues">常见问题 & 踩坑</button>
       </div>
-      <div class="sidebar-chapter"><button class="sidebar-ch-title pending"><span class="label">第二章</span>常用命令速查</button></div>
-      <div class="sidebar-chapter"><button class="sidebar-ch-title pending"><span class="label">第三章</span>Shell 脚本与自动化</button></div>
-      <div class="sidebar-chapter"><button class="sidebar-ch-title pending"><span class="label">第四章</span>终端工具链配置</button></div>
-      <div class="sidebar-chapter"><button class="sidebar-ch-title pending"><span class="label">第五章</span>SSH 远程开发与服务器运维</button></div>
-      <div class="sidebar-chapter"><button class="sidebar-ch-title pending"><span class="label">第六章</span>性能监控与调优</button></div>
-      <div class="sidebar-chapter"><button class="sidebar-ch-title pending"><span class="label">第七章</span>Docker 基础与实践</button></div>
+      <div class="sidebar-ch"><button class="sidebar-ch-title pending" data-chapter="commands"><span class="label dim">第二章</span>常用命令速查</button></div>
+      <div class="sidebar-ch"><button class="sidebar-ch-title pending" data-chapter="shell"><span class="label dim">第三章</span>Shell 脚本与自动化</button></div>
+      <div class="sidebar-ch"><button class="sidebar-ch-title pending" data-chapter="terminal"><span class="label dim">第四章</span>终端工具链配置</button></div>
+      <div class="sidebar-ch"><button class="sidebar-ch-title pending" data-chapter="ssh"><span class="label dim">第五章</span>SSH 远程开发与服务器运维</button></div>
+      <div class="sidebar-ch"><button class="sidebar-ch-title pending" data-chapter="monitoring"><span class="label dim">第六章</span>性能监控与调优</button></div>
+      <div class="sidebar-ch"><button class="sidebar-ch-title pending" data-chapter="docker"><span class="label dim">第七章</span>Docker 基础与实践</button></div>
     </nav>
   </aside>
 
@@ -173,17 +130,24 @@
     <h1 class="page-title">Linux 笔记</h1>
     <p class="page-desc">记录 Linux 开发环境配置、日常使用技巧与服务器运维经验。以实用为导向，覆盖 WSL2、Shell 脚本、性能监控等方向。</p>
 
+    <!-- chapter tabs -->
+    <div class="ch-tabs" id="ch-tabs">
+      <button class="ch-tab active" data-chapter="wsl2-setup">第一章</button>
+      <button class="ch-tab pending" data-chapter="commands">第二章</button>
+      <button class="ch-tab pending" data-chapter="shell">第三章</button>
+      <button class="ch-tab pending" data-chapter="terminal">第四章</button>
+      <button class="ch-tab pending" data-chapter="ssh">第五章</button>
+      <button class="ch-tab pending" data-chapter="monitoring">第六章</button>
+      <button class="ch-tab pending" data-chapter="docker">第七章</button>
+    </div>
+
     <!-- ══ 第一章：WSL2 ═══════════════════ -->
-    <div class="chapter" data-chapter="wsl2-setup">
-      <button class="chapter-header" data-toggle="wsl2-setup">
-        <div>
-          <span class="ch-label">第一章</span>
-          <span class="ch-title">WSL2 & Ubuntu 开发环境搭建</span>
-        </div>
-        <svg class="chevron open" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-      </button>
-      <div class="chapter-body open">
-        <div class="chapter-body-inner">
+    <div class="ch-panel visible" data-chapter-panel="wsl2-setup">
+      <div class="ch-panel-header">
+        <span class="ch-label">第一章</span>
+        <span class="ch-title">WSL2 & Ubuntu 开发环境搭建</span>
+      </div>
+      <div class="ch-panel-body">
 
 <h2 class="section-h2" id="wsl2-intro">1. WSL2 是什么、为什么用</h2>
 <p class="text-p">WSL2（Windows Subsystem for Linux 2）是 Windows 内置的 Linux 虚拟化方案，相比虚拟机更轻量，文件系统互通，能直接跑 Linux 二进制程序。</p>
@@ -298,109 +262,202 @@ echo "deb [signed-by=/etc/apt/keyrings/example.gpg] https://example.com/ stable 
 <h3 class="section-h3">WSL IP 每次重启后变化</h3>
 <p class="text-p">WSL2 是 NAT 网络，IP 会变。访问 WSL 里的服务直接用 <code class="text-code">localhost</code>，WSL2 会自动端口转发。如果转发失效，确认 <code class="text-code">.wslconfig</code> 里有 <code class="text-code">localhostForwarding=true</code>。</p>
 
-        </div>
       </div>
     </div>
 
-    <!-- ══ 待整理章节 ══ -->
-    <div class="chapter-pending">
-      <button class="chapter-header"><div><span class="ch-label">第二章</span><span class="ch-title">常用命令速查</span></div></button>
+    <!-- chapters 2-7: pending -->
+    <div class="ch-pending" data-chapter-panel="commands">
+      <div class="ch-panel-header"><span class="ch-label">第二章</span><span class="ch-title">常用命令速查</span></div>
       <p class="ch-pending-text">整理中，敬请期待…</p>
     </div>
-    <div class="chapter-pending">
-      <button class="chapter-header"><div><span class="ch-label">第三章</span><span class="ch-title">Shell 脚本与自动化</span></div></button>
+    <div class="ch-pending" data-chapter-panel="shell">
+      <div class="ch-panel-header"><span class="ch-label">第三章</span><span class="ch-title">Shell 脚本与自动化</span></div>
       <p class="ch-pending-text">整理中，敬请期待…</p>
     </div>
-    <div class="chapter-pending">
-      <button class="chapter-header"><div><span class="ch-label">第四章</span><span class="ch-title">终端工具链配置</span></div></button>
+    <div class="ch-pending" data-chapter-panel="terminal">
+      <div class="ch-panel-header"><span class="ch-label">第四章</span><span class="ch-title">终端工具链配置</span></div>
       <p class="ch-pending-text">整理中，敬请期待…</p>
     </div>
-    <div class="chapter-pending">
-      <button class="chapter-header"><div><span class="ch-label">第五章</span><span class="ch-title">SSH 远程开发与服务器运维</span></div></button>
+    <div class="ch-pending" data-chapter-panel="ssh">
+      <div class="ch-panel-header"><span class="ch-label">第五章</span><span class="ch-title">SSH 远程开发与服务器运维</span></div>
       <p class="ch-pending-text">整理中，敬请期待…</p>
     </div>
-    <div class="chapter-pending">
-      <button class="chapter-header"><div><span class="ch-label">第六章</span><span class="ch-title">性能监控与调优</span></div></button>
+    <div class="ch-pending" data-chapter-panel="monitoring">
+      <div class="ch-panel-header"><span class="ch-label">第六章</span><span class="ch-title">性能监控与调优</span></div>
       <p class="ch-pending-text">整理中，敬请期待…</p>
     </div>
-    <div class="chapter-pending">
-      <button class="chapter-header"><div><span class="ch-label">第七章</span><span class="ch-title">Docker 基础与实践</span></div></button>
+    <div class="ch-pending" data-chapter-panel="docker">
+      <div class="ch-panel-header"><span class="ch-label">第七章</span><span class="ch-title">Docker 基础与实践</span></div>
       <p class="ch-pending-text">整理中，敬请期待…</p>
     </div>
 
+    <!-- prev / next nav -->
+    <div class="ch-nav" id="ch-nav">
+      <div class="ch-nav-spacer"></div>
+      <button class="ch-nav-btn" id="nav-next" data-target="commands" style="display:none">下一章 → <span class="nav-label">(第二章 常用命令速查)</span></button>
+    </div>
   </div>
 </div>
 
 <script>
 (function() {
-  /* ── accordion toggle ── */
-  document.querySelectorAll('[data-toggle]').forEach(btn => {
-    btn.addEventListener('click', function() {
-      const chapterId = this.dataset.toggle;
-      const chapter = document.querySelector(`.chapter[data-chapter="${chapterId}"]`);
-      const body = chapter.querySelector('.chapter-body');
-      const chevron = this.querySelector('.chevron');
-      const isOpen = body.classList.contains('open');
+  const chapterIds = ['wsl2-setup', 'commands', 'shell', 'terminal', 'ssh', 'monitoring', 'docker'];
+  const pendingIds = ['commands', 'shell', 'terminal', 'ssh', 'monitoring', 'docker'];
+  let currentChapter = 'wsl2-setup';
+  let currentSection = 'wsl2-intro';
 
-      if (isOpen) {
-        body.classList.remove('open');
-        if (chevron) chevron.classList.remove('open');
-      } else {
-        body.classList.add('open');
-        if (chevron) chevron.classList.add('open');
+  /* ── switch chapter ── */
+  function switchChapter(chapterId, sectionId) {
+    if (pendingIds.includes(chapterId)) return; // pending chapters not clickable
+    currentChapter = chapterId;
+
+    // hide all panels, show target
+    document.querySelectorAll('.ch-panel, .ch-pending').forEach(el => el.classList.remove('visible'));
+    const panel = document.querySelector(`[data-chapter-panel="${chapterId}"]`);
+    if (panel) panel.classList.add('visible');
+
+    // update chapter tabs
+    document.querySelectorAll('.ch-tab').forEach(t => {
+      t.classList.toggle('active', t.dataset.chapter === chapterId);
+    });
+
+    // update sidebar chapter titles
+    document.querySelectorAll('.sidebar-ch-title').forEach(el => {
+      const isActive = el.dataset.chapter === chapterId;
+      el.classList.toggle('active', isActive && !el.classList.contains('pending'));
+      const label = el.querySelector('.label');
+      if (label) {
+        label.classList.toggle('active-label', isActive);
+        label.classList.toggle('dim', !isActive);
       }
     });
-  });
 
-  /* ── sidebar navigation ── */
-  document.querySelectorAll('.sidebar-sub, .sidebar-ch-title:not(.pending)').forEach(el => {
-    el.addEventListener('click', function() {
-      const chapterId = this.dataset.chapter;
-      const sectionId = this.dataset.section;
+    // show relevant sub-sections, hide others
+    document.querySelectorAll('.sidebar-sub').forEach(el => {
+      el.style.display = el.dataset.chapter === chapterId ? 'block' : 'none';
+      el.classList.toggle('active', el.dataset.section === sectionId);
+    });
 
-      // expand the chapter if collapsed
-      if (chapterId) {
-        const chapter = document.querySelector(`.chapter[data-chapter="${chapterId}"]`);
-        if (chapter) {
-          const body = chapter.querySelector('.chapter-body');
-          const chevron = chapter.querySelector('.chevron');
-          if (body && !body.classList.contains('open')) {
-            body.classList.add('open');
-            if (chevron) chevron.classList.add('open');
-          }
+    // update prev/next nav
+    updateNav(chapterId);
+
+    // scroll to section
+    if (sectionId) {
+      currentSection = sectionId;
+      setTimeout(() => {
+        const target = document.getElementById(sectionId);
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+          // scroll to chapter top
+          const panel = document.querySelector(`[data-chapter-panel="${chapterId}"]`);
+          if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
-      }
+      }, 50);
+    }
 
-      // scroll to section
-      const targetId = sectionId || (chapterId ? document.querySelector(`[data-chapter="${chapterId}"] .section-h2`)?.id : null);
-      if (targetId) {
-        setTimeout(() => {
-          const target = document.getElementById(targetId);
-          if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }, 100);
-      }
-    });
-  });
+    // re-observe sections
+    setupObserver();
+  }
 
-  /* ── scroll tracking: highlight active section in sidebar ── */
-  const allSubs = document.querySelectorAll('.sidebar-sub');
-  const sectionIds = Array.from(allSubs).map(el => el.dataset.section);
+  /* ── prev / next ── */
+  function updateNav(chapterId) {
+    const idx = chapterIds.indexOf(chapterId);
+    const prevBtn = document.getElementById('nav-prev');
+    const nextBtn = document.getElementById('nav-next');
 
-  const observer = new IntersectionObserver((entries) => {
-    for (const entry of entries) {
-      if (entry.isIntersecting) {
-        allSubs.forEach(s => s.classList.remove('active'));
-        const active = document.querySelector(`.sidebar-sub[data-section="${entry.target.id}"]`);
-        if (active) active.classList.add('active');
-        break;
+    // find prev non-pending
+    let prevId = null;
+    for (let i = idx - 1; i >= 0; i--) {
+      if (!pendingIds.includes(chapterIds[i])) { prevId = chapterIds[i]; break; }
+    }
+    // find next non-pending at or after this position
+    let nextId = null;
+    for (let i = idx + 1; i < chapterIds.length; i++) {
+      if (!pendingIds.includes(chapterIds[i])) { nextId = chapterIds[i]; break; }
+    }
+
+    // create prev button if needed
+    if (prevId && !prevBtn) {
+      const btn = document.createElement('button');
+      btn.className = 'ch-nav-btn'; btn.id = 'nav-prev';
+      btn.innerHTML = '← 上一章';
+      btn.addEventListener('click', () => switchChapter(prevId));
+      const nav = document.getElementById('ch-nav');
+      nav.insertBefore(btn, nav.firstChild);
+    } else if (!prevId && prevBtn) {
+      prevBtn.remove();
+    } else if (prevId && prevBtn) {
+      prevBtn.dataset.target = prevId;
+      prevBtn.onclick = () => switchChapter(prevId);
+    }
+
+    if (nextBtn) {
+      if (nextId) {
+        nextBtn.style.display = '';
+        nextBtn.dataset.target = nextId;
+        nextBtn.onclick = () => switchChapter(nextId);
+      } else {
+        nextBtn.style.display = 'none';
       }
     }
-  }, { rootMargin: '-15% 0px -75% 0px', threshold: 0 });
+  }
 
-  sectionIds.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) observer.observe(el);
+  /* ── sidebar click ── */
+  document.querySelectorAll('.sidebar-ch-title:not(.pending)').forEach(el => {
+    el.addEventListener('click', () => {
+      const chapterId = el.dataset.chapter;
+      const panel = document.querySelector(`[data-chapter-panel="${chapterId}"]`);
+      const firstSection = panel?.querySelector('.section-h2');
+      switchChapter(chapterId, firstSection?.id || null);
+    });
   });
+
+  document.querySelectorAll('.sidebar-sub').forEach(el => {
+    el.addEventListener('click', () => {
+      switchChapter(el.dataset.chapter, el.dataset.section);
+    });
+  });
+
+  /* ── tab click ── */
+  document.querySelectorAll('.ch-tab:not(.pending)').forEach(el => {
+    el.addEventListener('click', () => {
+      const chapterId = el.dataset.chapter;
+      const panel = document.querySelector(`[data-chapter-panel="${chapterId}"]`);
+      const firstSection = panel?.querySelector('.section-h2');
+      switchChapter(chapterId, firstSection?.id || null);
+    });
+  });
+
+  /* ── scroll tracking ── */
+  let observer;
+  function setupObserver() {
+    if (observer) observer.disconnect();
+
+    const subs = document.querySelectorAll(`.sidebar-sub[data-chapter="${currentChapter}"]`);
+    if (subs.length === 0) return;
+
+    observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          document.querySelectorAll('.sidebar-sub').forEach(s => s.classList.remove('active'));
+          const active = document.querySelector(`.sidebar-sub[data-section="${entry.target.id}"]`);
+          if (active) active.classList.add('active');
+          currentSection = entry.target.id;
+          break;
+        }
+      }
+    }, { rootMargin: '-15% 0px -75% 0px', threshold: 0 });
+
+    subs.forEach(s => {
+      const el = document.getElementById(s.dataset.section);
+      if (el) observer.observe(el);
+    });
+  }
+
+  // init
+  updateNav('wsl2-setup');
+  setupObserver();
 })();
 </script>
 
