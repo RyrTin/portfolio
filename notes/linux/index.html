@@ -1,154 +1,212 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Linux 笔记</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linux 笔记 — 个人主页</title>
 <style>
-  *, ::before, ::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: #0f172a; color: #cbd5e1; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; line-height: 1.7; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #0f172a; color: #e2e8f0; line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* header */
+  .header {
+    position: sticky; top: 0; z-index: 40;
+    background: rgba(15,23,42,0.95); backdrop-filter: blur(8px);
+    border-bottom: 1px solid #1e293b;
+  }
+  .header-inner {
+    max-width: 1200px; margin: 0 auto; padding: 16px 24px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .header a { color: #94a3b8; font-size: 0.875rem; text-decoration: none; transition: color 0.2s; }
+  .header a:hover { color: #60a5fa; }
+  .header .sep { color: #475569; }
+
+  /* layout */
+  .main { max-width: 1200px; margin: 0 auto; padding: 48px 24px; display: flex; gap: 40px; align-items: flex-start; }
+
+  /* sidebar */
+  .sidebar {
+    width: 224px; flex-shrink: 0; position: sticky; top: 96px;
+    max-height: calc(100vh - 112px); overflow-y: auto;
+  }
+  .sidebar-title { font-size: 0.75rem; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; }
+  .sidebar-chapter { margin-bottom: 12px; }
+  .sidebar-ch-title {
+    display: block; width: 100%; text-align: left; padding: 4px 8px; border-radius: 4px;
+    font-size: 0.75rem; font-weight: 600; color: #94a3b8; background: none; border: none;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .sidebar-ch-title:hover { color: #e2e8f0; background: rgba(30,41,59,0.5); }
+  .sidebar-ch-title.pending { color: #475569; cursor: default; }
+  .sidebar-ch-title .label { font-family: monospace; font-size: 0.65rem; color: #475569; margin-right: 6px; }
+  .sidebar-sub { display: block; width: 100%; text-align: left; padding: 2px 8px 2px 24px; border-radius: 4px;
+    font-size: 0.75rem; color: #64748b; background: none; border: none; cursor: pointer; transition: all 0.15s;
+  }
+  .sidebar-sub:hover { color: #cbd5e1; background: rgba(30,41,59,0.4); }
+  .sidebar-sub.active { color: #60a5fa; background: rgba(59,130,246,0.1); }
+
+  /* content area */
+  .content { flex: 1; min-width: 0; }
+  .page-meta { font-family: monospace; font-size: 0.75rem; color: #60a5fa; }
+  .page-title { font-size: 1.875rem; font-weight: 700; color: #fff; margin: 4px 0 12px; }
+  .page-desc { font-size: 0.875rem; color: #94a3b8; line-height: 1.7; max-width: 560px; }
+
+  /* accordion chapter */
+  .chapter {
+    border: 1px solid #1e293b; border-radius: 12px; margin-bottom: 24px; overflow: hidden;
+  }
+  .chapter-header {
+    width: 100%; text-align: left; padding: 16px 20px;
+    background: rgba(30,41,59,0.6); border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    transition: background 0.15s;
+  }
+  .chapter-header:hover { background: rgba(30,41,59,0.8); }
+  .chapter-header .ch-label { font-family: monospace; font-size: 0.75rem; color: #64748b; display: block; }
+  .chapter-header .ch-title { font-size: 1rem; font-weight: 600; color: #e2e8f0; }
+  .chapter-header .chevron {
+    width: 20px; height: 20px; color: #64748b; flex-shrink: 0;
+    transition: transform 0.3s;
+  }
+  .chapter-header .chevron.open { transform: rotate(180deg); }
+  .chapter-body {
+    max-height: 0; overflow: hidden; opacity: 0;
+    transition: max-height 0.3s ease, opacity 0.3s ease;
+  }
+  .chapter-body.open { max-height: 9999px; opacity: 1; }
+  .chapter-body-inner { padding: 0 20px 24px; }
+
+  /* pending chapter */
+  .chapter-pending {
+    border: 1px solid #1e293b; border-radius: 12px; margin-bottom: 24px; overflow: hidden; opacity: 0.4;
+  }
+  .chapter-pending .chapter-header { cursor: default; }
+  .chapter-pending .chapter-header:hover { background: rgba(30,41,59,0.6); }
+  .chapter-pending .ch-title { color: #64748b; }
+  .chapter-pending .ch-pending-text { padding: 0 20px 20px; font-size: 0.875rem; color: #475569; }
+
+  /* typography */
+  .section-h2 {
+    font-size: 1.25rem; font-weight: 700; color: #fff; margin-top: 48px; margin-bottom: 16px;
+    scroll-margin-top: 112px; padding-bottom: 8px; border-bottom: 1px solid #1e293b;
+  }
+  .section-h3 { font-size: 1rem; font-weight: 600; color: #e2e8f0; margin-top: 24px; margin-bottom: 8px; }
+  .text-p { font-size: 0.9375rem; color: #94a3b8; line-height: 1.7; margin-bottom: 12px; }
+  .text-code { padding: 2px 6px; border-radius: 4px; background: #1e293b; color: #93c5fd; font-size: 0.85em; font-family: monospace; }
+  .pre-block {
+    background: rgba(30,41,59,0.8); border: 1px solid rgba(51,65,85,0.6);
+    border-radius: 8px; padding: 16px; overflow-x: auto;
+    font-size: 0.875rem; font-family: 'Consolas', 'Monaco', monospace;
+    color: #cbd5e1; line-height: 1.6; margin: 16px 0; white-space: pre;
+  }
+  .note-box {
+    background: rgba(30,58,138,0.15); border: 1px solid rgba(30,64,175,0.4);
+    border-radius: 8px; padding: 12px 16px; margin: 16px 0;
+    font-size: 0.875rem; color: #93c5fd; line-height: 1.7;
+  }
+  .warn-box {
+    background: rgba(113,63,18,0.1); border: 1px solid rgba(161,98,7,0.3);
+    border-radius: 8px; padding: 12px 16px; margin: 16px 0;
+    font-size: 0.875rem; color: #fde047; line-height: 1.7;
+  }
+  .list-ul {
+    list-style: disc inside; color: #94a3b8; font-size: 0.9375rem; line-height: 1.7;
+    margin-bottom: 12px; padding-left: 8px;
+  }
+  .list-ul li { margin-bottom: 4px; }
+
   a { color: #60a5fa; text-decoration: none; }
   a:hover { text-decoration: underline; }
 
-  /* topbar */
-  .topbar { position: sticky; top: 0; z-index: 40; background: rgba(15,23,42,0.95); backdrop-filter: blur(8px); border-bottom: 1px solid #1e293b; }
-  .topbar-inner { max-width: 1100px; margin: 0 auto; padding: 14px 24px; display: flex; align-items: center; gap: 12px; }
-  .back { color: #94a3b8; font-size: 0.875rem; }
-  .back:hover { color: #60a5fa; }
-  .sep { color: #475569; }
-  .page-title { color: #e2e8f0; font-size: 0.875rem; font-weight: 500; }
-
-  /* layout */
-  .layout { max-width: 1100px; margin: 0 auto; padding: 40px 24px 80px; display: flex; gap: 40px; align-items: flex-start; }
-
-  /* sidebar */
-  .sidebar { width: 220px; flex-shrink: 0; position: sticky; top: 72px; max-height: calc(100vh - 80px); overflow-y: auto; }
-  .sidebar-label { color: #64748b; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; }
-  .ch-title { display: block; width: 100%; text-align: left; background: none; border: none; cursor: pointer; padding: 6px 8px; border-radius: 6px; font-size: 0.78rem; font-weight: 600; color: #64748b; line-height: 1.4; transition: color 0.15s, background 0.15s; }
-  .ch-title:not(.pending):hover { color: #e2e8f0; background: rgba(30,41,59,0.5); }
-  .ch-title.pending { cursor: default; }
-  .ch-label { font-family: monospace; font-size: 0.65rem; color: #475569; margin-right: 4px; }
-  .nav-item { display: block; width: 100%; text-align: left; background: none; border: none; cursor: pointer; padding: 4px 8px 4px 20px; border-radius: 6px; font-size: 0.75rem; color: #64748b; transition: color 0.15s, background 0.15s; line-height: 1.5; }
-  .nav-item:hover { color: #94a3b8; background: rgba(30,41,59,0.4); }
-  .nav-item.active { color: #60a5fa; background: rgba(30,58,138,0.25); }
-
-  /* article */
-  .article { flex: 1; min-width: 0; }
-  .article-header { margin-bottom: 36px; }
-  .mono-label { color: #3b82f6; font-family: monospace; font-size: 0.75rem; margin-bottom: 4px; }
-  .article-header h1 { font-size: 1.75rem; font-weight: 700; color: #f1f5f9; margin-bottom: 10px; }
-  .article-header p { color: #94a3b8; font-size: 0.9375rem; line-height: 1.8; max-width: 560px; }
-
-  /* chapter opener */
-  .ch-opener { margin-top: 16px; margin-bottom: 20px; }
-  .ch-opener .ch-num { font-family: monospace; font-size: 0.7rem; color: #64748b; margin-bottom: 4px; }
-  .ch-opener .ch-name { font-size: 1.1rem; font-weight: 700; color: #94a3b8; }
-
-  /* headings */
-  .article h2 { font-size: 1.2rem; font-weight: 700; color: #f1f5f9; margin-top: 48px; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1px solid #1e293b; scroll-margin-top: 80px; }
-  .article h3 { font-size: 1rem; font-weight: 600; color: #e2e8f0; margin-top: 24px; margin-bottom: 8px; }
-  .article p { color: #94a3b8; font-size: 0.9375rem; line-height: 1.8; margin-bottom: 12px; }
-  .article ul { color: #94a3b8; font-size: 0.9375rem; line-height: 1.8; margin-bottom: 12px; padding-left: 20px; }
-  .article li { margin-bottom: 4px; }
-  .article code { padding: 2px 6px; border-radius: 4px; background: #1e293b; color: #93c5fd; font-size: 0.84em; font-family: 'Courier New', monospace; }
-  pre { background: rgba(15,23,42,0.8); border: 1px solid #334155; border-radius: 8px; padding: 16px; overflow-x: auto; margin: 14px 0; }
-  pre code { background: none; color: #cbd5e1; font-size: 0.875rem; line-height: 1.7; padding: 0; border-radius: 0; }
-
-  /* callout boxes */
-  .note { background: rgba(30,58,138,0.2); border: 1px solid rgba(30,64,175,0.35); border-radius: 8px; padding: 12px 16px; margin: 14px 0; font-size: 0.875rem; color: #93c5fd; line-height: 1.7; }
-  .warn { background: rgba(113,63,18,0.15); border: 1px solid rgba(202,138,4,0.3); border-radius: 8px; padding: 12px 16px; margin: 14px 0; font-size: 0.875rem; color: #fde047; line-height: 1.7; }
-
-  /* pending placeholder */
-  .pending-block { margin-top: 48px; border: 1px solid #1e293b; border-radius: 12px; padding: 40px; text-align: center; opacity: 0.45; scroll-margin-top: 80px; }
-  .pending-block .pch { font-family: monospace; font-size: 0.7rem; color: #475569; margin-bottom: 6px; }
-  .pending-block .ptitle { color: #94a3b8; font-weight: 600; }
-  .pending-block .psub { color: #475569; font-size: 0.8rem; margin-top: 6px; }
-
-  /* mobile: hide sidebar */
-  @media (max-width: 768px) {
+  @media (max-width: 1024px) {
     .sidebar { display: none; }
-    .layout { gap: 0; }
+  }
+  @media (max-width: 640px) {
+    .main { padding: 32px 16px; }
+    .page-title { font-size: 1.5rem; }
   }
 </style>
 </head>
 <body>
 
-<!-- topbar -->
-<div class="topbar">
-  <div class="topbar-inner">
-    <a href="../../preview.html" class="back">← 返回首页</a>
+<!-- header -->
+<header class="header">
+  <div class="header-inner">
+    <a href="../../preview.html">← 返回首页</a>
     <span class="sep">|</span>
-    <span class="page-title">Linux 笔记</span>
+    <span style="font-size:0.875rem;color:#cbd5e1;">Linux 笔记</span>
   </div>
-</div>
+</header>
 
-<div class="layout">
-
+<!-- main layout -->
+<div class="main">
   <!-- sidebar -->
-  <aside class="sidebar">
-    <p class="sidebar-label">目录</p>
-    <nav id="sidebar-nav">
-      <!-- ch1 -->
-      <button class="ch-title" onclick="scrollTo('wsl2-intro')">
-        <span class="ch-label">第一章</span>WSL2 & Ubuntu 开发环境
-      </button>
-      <button class="nav-item" data-target="wsl2-intro" onclick="scrollTo('wsl2-intro')">WSL2 是什么、为什么用</button>
-      <button class="nav-item" data-target="wsl2-install" onclick="scrollTo('wsl2-install')">WSL2 安装</button>
-      <button class="nav-item" data-target="ubuntu-config" onclick="scrollTo('ubuntu-config')">Ubuntu 基础配置</button>
-      <button class="nav-item" data-target="filesystem" onclick="scrollTo('filesystem')">文件系统互通</button>
-      <button class="nav-item" data-target="dev-tools" onclick="scrollTo('dev-tools')">开发工具链安装</button>
-      <button class="nav-item" data-target="wsl2-issues" onclick="scrollTo('wsl2-issues')">常见问题 & 踩坑</button>
-      <!-- pending chapters -->
-      <button class="ch-title pending" style="margin-top:6px;"><span class="ch-label">第二章</span>常用命令速查</button>
-      <button class="ch-title pending"><span class="ch-label">第三章</span>Shell 脚本与自动化</button>
-      <button class="ch-title pending"><span class="ch-label">第四章</span>终端工具链配置</button>
-      <button class="ch-title pending"><span class="ch-label">第五章</span>SSH 远程开发</button>
-      <button class="ch-title pending"><span class="ch-label">第六章</span>性能监控与调优</button>
-      <button class="ch-title pending"><span class="ch-label">第七章</span>Docker 基础与实践</button>
+  <aside class="sidebar" id="sidebar">
+    <p class="sidebar-title">目录</p>
+    <nav>
+      <div class="sidebar-chapter">
+        <button class="sidebar-ch-title" data-chapter="wsl2-setup"><span class="label">第一章</span>WSL2 & Ubuntu 开发环境搭建</button>
+        <button class="sidebar-sub active" data-chapter="wsl2-setup" data-section="wsl2-intro">WSL2 是什么、为什么用</button>
+        <button class="sidebar-sub" data-chapter="wsl2-setup" data-section="wsl2-install">WSL2 安装</button>
+        <button class="sidebar-sub" data-chapter="wsl2-setup" data-section="ubuntu-config">Ubuntu 基础配置</button>
+        <button class="sidebar-sub" data-chapter="wsl2-setup" data-section="filesystem">文件系统互通</button>
+        <button class="sidebar-sub" data-chapter="wsl2-setup" data-section="dev-tools">开发工具链安装</button>
+        <button class="sidebar-sub" data-chapter="wsl2-setup" data-section="wsl2-issues">常见问题 & 踩坑</button>
+      </div>
+      <div class="sidebar-chapter"><button class="sidebar-ch-title pending"><span class="label">第二章</span>常用命令速查</button></div>
+      <div class="sidebar-chapter"><button class="sidebar-ch-title pending"><span class="label">第三章</span>Shell 脚本与自动化</button></div>
+      <div class="sidebar-chapter"><button class="sidebar-ch-title pending"><span class="label">第四章</span>终端工具链配置</button></div>
+      <div class="sidebar-chapter"><button class="sidebar-ch-title pending"><span class="label">第五章</span>SSH 远程开发与服务器运维</button></div>
+      <div class="sidebar-chapter"><button class="sidebar-ch-title pending"><span class="label">第六章</span>性能监控与调优</button></div>
+      <div class="sidebar-chapter"><button class="sidebar-ch-title pending"><span class="label">第七章</span>Docker 基础与实践</button></div>
     </nav>
   </aside>
 
-  <!-- article -->
-  <article class="article">
+  <!-- content -->
+  <div class="content" id="content">
+    <p class="page-meta">// notes / linux</p>
+    <h1 class="page-title">Linux 笔记</h1>
+    <p class="page-desc">记录 Linux 开发环境配置、日常使用技巧与服务器运维经验。以实用为导向，覆盖 WSL2、Shell 脚本、性能监控等方向。</p>
 
-    <!-- header -->
-    <div class="article-header">
-      <p class="mono-label">// notes / linux</p>
-      <h1>Linux 笔记</h1>
-      <p>记录 Linux 开发环境配置、日常使用技巧与服务器运维经验。以实用为导向，覆盖 WSL2、Shell 脚本、性能监控等方向。</p>
-    </div>
+    <!-- ══ 第一章：WSL2 ═══════════════════ -->
+    <div class="chapter" data-chapter="wsl2-setup">
+      <button class="chapter-header" data-toggle="wsl2-setup">
+        <div>
+          <span class="ch-label">第一章</span>
+          <span class="ch-title">WSL2 & Ubuntu 开发环境搭建</span>
+        </div>
+        <svg class="chevron open" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+      </button>
+      <div class="chapter-body open">
+        <div class="chapter-body-inner">
 
-    <!-- ch1 opener -->
-    <div class="ch-opener">
-      <p class="ch-num">第一章</p>
-      <p class="ch-name">WSL2 & Ubuntu 开发环境搭建</p>
-    </div>
+<h2 class="section-h2" id="wsl2-intro">1. WSL2 是什么、为什么用</h2>
+<p class="text-p">WSL2（Windows Subsystem for Linux 2）是 Windows 内置的 Linux 虚拟化方案，相比虚拟机更轻量，文件系统互通，能直接跑 Linux 二进制程序。</p>
+<p class="text-p">对我而言最实用的几点：</p>
+<ul class="list-ul">
+  <li><code class="text-code">/mnt/c/</code> 挂载 C 盘，Linux 和 Windows 文件系统直接互通</li>
+  <li>能跑 Docker，不需要 Docker Desktop 的额外开销</li>
+  <li>VSCode 的 WSL 远程插件体验接近原生</li>
+  <li>比完整虚拟机省内存，启动秒级</li>
+</ul>
+<div class="warn-box">⚠️ 如果机器是 Windows 10 且版本较老（19041 之前），建议先升级。WSL2 对内核版本有要求，老版本装起来很折腾。</div>
 
-    <!-- 1 -->
-    <h2 id="wsl2-intro">1. WSL2 是什么、为什么用</h2>
-    <p>WSL2（Windows Subsystem for Linux 2）是 Windows 内置的 Linux 虚拟化方案，相比虚拟机更轻量，文件系统互通，能直接跑 Linux 二进制程序。</p>
-    <p>对我而言最实用的几点：</p>
-    <ul>
-      <li><code>/mnt/c/</code> 挂载 C 盘，Linux 和 Windows 文件系统直接互通</li>
-      <li>能跑 Docker，不需要 Docker Desktop 的额外开销</li>
-      <li>VSCode 的 WSL 远程插件体验接近原生</li>
-      <li>比完整虚拟机省内存，启动秒级</li>
-    </ul>
-    <div class="warn">⚠️ 如果机器是 Windows 10 且版本较老（19041 之前），建议先升级。WSL2 对内核版本有要求，老版本装起来很折腾。</div>
+<h2 class="section-h2" id="wsl2-install">2. WSL2 安装（PowerShell 一行搞定）</h2>
+<p class="text-p">以管理员身份打开 PowerShell，执行：</p>
+<div class="pre-block">wsl --install</div>
+<p class="text-p">这条命令会自动完成：启用 WSL 可选功能、安装 WSL2 内核、设为默认版本、安装 Ubuntu 作为默认发行版。</p>
+<p class="text-p">安装完成后重启电脑，首次进入 Ubuntu 会要求设置用户名和密码（输入密码时终端不显示字符，正常的）。重启后在开始菜单找 "Ubuntu" 或在 PowerShell 里输入 <code class="text-code">wsl</code> 进入。</p>
+<div class="note-box">💡 如果提示"无法解析服务器地址"或卡在下载，大概率是网络问题。可从 <a href="https://learn.microsoft.com/windows/wsl/install-manual" target="_blank" rel="noopener">Microsoft 官方文档</a> 手动下载离线包安装。</div>
 
-    <!-- 2 -->
-    <h2 id="wsl2-install">2. WSL2 安装（PowerShell 一行搞定）</h2>
-    <p>以管理员身份打开 PowerShell，执行：</p>
-    <pre><code>wsl --install</code></pre>
-    <p>这条命令会自动完成：启用 WSL 可选功能、安装 WSL2 内核、设为默认版本、安装 Ubuntu 作为默认发行版。</p>
-    <p>安装完成后重启电脑，首次进入 Ubuntu 会要求设置用户名和密码（输入密码时终端不显示字符，正常的）。重启后在开始菜单找 "Ubuntu" 或在 PowerShell 里输入 <code>wsl</code> 进入。</p>
-    <div class="note">💡 如果提示"无法解析服务器地址"或卡在下载，大概率是网络问题。可从 <a href="https://learn.microsoft.com/windows/wsl/install-manual" target="_blank">Microsoft 官方文档</a> 手动下载离线包安装。</div>
-
-    <!-- 3 -->
-    <h2 id="ubuntu-config">3. Ubuntu 基础配置</h2>
-    <h3>3.1 换国内源（apt 加速）</h3>
-    <p>Ubuntu 默认源在国外，<code>apt update</code> 经常超时。换成清华源：</p>
-    <pre><code># 备份原文件
+<h2 class="section-h2" id="ubuntu-config">3. Ubuntu 基础配置</h2>
+<h3 class="section-h3">3.1 换国内源（apt 加速）</h3>
+<p class="text-p">Ubuntu 默认源在国外，<code class="text-code">apt update</code> 经常超时。换成清华源：</p>
+<div class="pre-block"># 备份原文件
 sudo cp /etc/apt/sources.list /etc/apt/sources.list.bak
 
 # 替换为清华源（Ubuntu 22.04 / jammy）
@@ -156,43 +214,40 @@ sudo sed -i "s@http://.*archive.ubuntu.com@https://mirrors.tuna.tsinghua.edu.cn@
 sudo sed -i "s@http://.*security.ubuntu.com@https://mirrors.tuna.tsinghua.edu.cn@g" /etc/apt/sources.list
 
 # 更新索引
-sudo apt update && sudo apt upgrade -y</code></pre>
-    <p>Ubuntu 24.04（Noble）的 sources.list 格式变了（DEB822），直接编辑 <code>/etc/apt/sources.list.d/ubuntu.sources</code> 改 URL。</p>
+sudo apt update && sudo apt upgrade -y</div>
+<p class="text-p">Ubuntu 24.04（Noble）的 sources.list 格式变了（DEB822），直接编辑 <code class="text-code">/etc/apt/sources.list.d/ubuntu.sources</code> 改 URL。</p>
 
-    <h3>3.2 安装基础工具包</h3>
-    <pre><code>sudo apt install -y \
+<h3 class="section-h3">3.2 安装基础工具包</h3>
+<div class="pre-block">sudo apt install -y \
   build-essential \
   curl wget git \
   vim tmux \
   htop tree \
   net-tools iproute2 \
   software-properties-common \
-  ca-certificates gnupg lsb-release</code></pre>
+  ca-certificates gnupg lsb-release</div>
+<p class="text-p">这几个包覆盖了 90% 的日常需求：编译工具链、下载、Git、编辑器、进程监控、网络诊断。</p>
 
-    <h3>3.3 配置 Git</h3>
-    <pre><code>git config --global user.name "你的名字"
+<h3 class="section-h3">3.3 配置 Git</h3>
+<div class="pre-block">git config --global user.name "你的名字"
 git config --global user.email "你的邮箱"
 git config --global core.editor "vim"
-git config --global pull.rebase false</code></pre>
+git config --global pull.rebase false</div>
 
-    <!-- 4 -->
-    <h2 id="filesystem">4. Windows 与 WSL 文件系统互通</h2>
-    <h3>4.1 从 WSL 访问 Windows 文件</h3>
-    <p>Windows 各盘符自动挂载在 <code>/mnt/</code> 下：</p>
-    <pre><code>cd /mnt/c/Users/你的用户名/
-code /mnt/c/Users/你/Desktop/test.py</code></pre>
+<h2 class="section-h2" id="filesystem">4. Windows 与 WSL 文件系统互通</h2>
+<h3 class="section-h3">4.1 从 WSL 访问 Windows 文件</h3>
+<p class="text-p">Windows 各盘符自动挂载在 <code class="text-code">/mnt/</code> 下：</p>
+<div class="pre-block">cd /mnt/c/Users/你的用户名/
+code /mnt/c/Users/你/Desktop/test.py</div>
+<h3 class="section-h3">4.2 从 Windows 访问 WSL 文件</h3>
+<p class="text-p">在文件资源管理器地址栏输入 <code class="text-code">\\wsl$\Ubuntu\home\用户名\</code>，或在 WSL 里输入 <code class="text-code">explorer.exe .</code> 直接打开当前目录。</p>
+<h3 class="section-h3">4.3 坑：跨文件系统性能差异</h3>
+<p class="text-p">在 <code class="text-code">/mnt/c/</code> 下跑 Linux 工具（<code class="text-code">pip install</code>、<code class="text-code">npm install</code>）会比 WSL 原生文件系统慢 5-10 倍。</p>
+<div class="note-box">💡 最佳实践：开发项目放在 <code class="text-code">~/projects/</code>（WSL 原生），不要用 Windows 文件系统跑 Linux 工具链。VSCode 用 Remote WSL 插件打开项目，不要直接打开 <code class="text-code">\\wsl$\...</code> 路径。</div>
 
-    <h3>4.2 从 Windows 访问 WSL 文件</h3>
-    <p>在文件资源管理器地址栏输入 <code>\\wsl$\Ubuntu\home\用户名\</code>，或在 WSL 里输入 <code>explorer.exe .</code> 直接打开当前目录。</p>
-
-    <h3>4.3 坑：跨文件系统性能差异</h3>
-    <p>在 <code>/mnt/c/</code> 下跑 Linux 工具（<code>pip install</code>、<code>npm install</code>）会比 WSL 原生文件系统慢 5-10 倍。</p>
-    <div class="note">💡 最佳实践：开发项目放在 <code>~/projects/</code>（WSL 原生），不要用 Windows 文件系统跑 Linux 工具链。VSCode 用 Remote WSL 插件打开项目，不要直接打开 <code>\\wsl$\...</code> 路径。</div>
-
-    <!-- 5 -->
-    <h2 id="dev-tools">5. 开发工具链安装</h2>
-    <h3>5.1 Python 环境（pyenv + venv）</h3>
-    <pre><code># 安装 pyenv 编译依赖
+<h2 class="section-h2" id="dev-tools">5. 开发工具链安装</h2>
+<h3 class="section-h3">5.1 Python 环境（pyenv + venv）</h3>
+<div class="pre-block"># 安装 pyenv 编译依赖
 sudo apt install -y make build-essential libssl-dev zlib1g-dev \
   libbz2-dev libreadline-dev libsqlite3-dev \
   libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev
@@ -209,13 +264,11 @@ source ~/.bashrc
 
 # 安装 Python
 pyenv install 3.11.8
-pyenv global 3.11.8</code></pre>
-
-    <h3>5.2 VSCode + WSL 远程开发</h3>
-    <p>Windows 侧 VSCode 安装 <code>WSL</code> 扩展，然后在 WSL 终端输入 <code>code .</code>，左下角显示 "WSL: Ubuntu" 即连接成功。</p>
-
-    <h3>5.3 Docker in WSL2（不装 Docker Desktop）</h3>
-    <pre><code># 清理旧版本（避免冲突）
+pyenv global 3.11.8</div>
+<h3 class="section-h3">5.2 VSCode + WSL 远程开发</h3>
+<p class="text-p">在 Windows 侧 VSCode 安装 <code class="text-code">WSL</code> 扩展，然后在 WSL 终端里输入 <code class="text-code">code .</code>，VSCode 会自动连接 WSL 环境。左下角显示 "WSL: Ubuntu" 即连接成功，终端/解释器/linter 全部在 WSL 里跑。</p>
+<h3 class="section-h3">5.3 Docker in WSL2（不装 Docker Desktop）</h3>
+<div class="pre-block"># 清理旧版本（避免冲突）
 sudo apt remove docker docker.io containerd runc 2>/dev/null
 
 # 安装
@@ -226,84 +279,129 @@ sudo sh get-docker.sh
 sudo usermod -aG docker $USER
 # 重新登录后生效
 
-docker run hello-world</code></pre>
+# 验证
+docker run hello-world</div>
 
-    <!-- 6 -->
-    <h2 id="wsl2-issues">6. 常见问题 & 踩坑记录</h2>
-    <h3>WSL2 占用内存过高</h3>
-    <p>WSL2 默认会吃满宿主机内存。在 <code>%USERPROFILE%\.wslconfig</code>（Windows 侧）限制：</p>
-    <pre><code>[wsl2]
+<h2 class="section-h2" id="wsl2-issues">6. 常见问题 & 踩坑记录</h2>
+<h3 class="section-h3">WSL2 占用内存过高</h3>
+<p class="text-p">WSL2 默认会吃满宿主机内存。在 <code class="text-code">%USERPROFILE%\.wslconfig</code>（Windows 侧）限制：</p>
+<div class="pre-block">[wsl2]
 memory=8GB
 swap=4GB
-localhostForwarding=true</code></pre>
-    <p>修改后执行 <code>wsl --shutdown</code> 重启生效。</p>
-
-    <h3>apt update 时 GPG 密钥错误</h3>
-    <p>现代 Ubuntu（22.04+）正确处理——不要用已废弃的 <code>apt-key</code>：</p>
-    <pre><code>curl -fsSL https://example.com/KEY.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/example.gpg
+localhostForwarding=true</div>
+<p class="text-p">修改后执行 <code class="text-code">wsl --shutdown</code> 重启生效。</p>
+<h3 class="section-h3">apt update 时 GPG 密钥错误</h3>
+<p class="text-p">现代 Ubuntu（22.04+）正确处理方式——不要用已废弃的 <code class="text-code">apt-key</code>：</p>
+<div class="pre-block">curl -fsSL https://example.com/KEY.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/example.gpg
 echo "deb [signed-by=/etc/apt/keyrings/example.gpg] https://example.com/ stable main" \
-  | sudo tee /etc/apt/sources.list.d/example.list</code></pre>
+  | sudo tee /etc/apt/sources.list.d/example.list</div>
+<h3 class="section-h3">WSL IP 每次重启后变化</h3>
+<p class="text-p">WSL2 是 NAT 网络，IP 会变。访问 WSL 里的服务直接用 <code class="text-code">localhost</code>，WSL2 会自动端口转发。如果转发失效，确认 <code class="text-code">.wslconfig</code> 里有 <code class="text-code">localhostForwarding=true</code>。</p>
 
-    <h3>WSL IP 每次重启后变化</h3>
-    <p>WSL2 是 NAT 网络，IP 会变。访问 WSL 里的服务直接用 <code>localhost</code>，WSL2 自动做端口转发。如转发失效，确认 <code>.wslconfig</code> 里有 <code>localhostForwarding=true</code>。</p>
-
-    <!-- pending -->
-    <div class="pending-block" id="ch2-pending">
-      <p class="pch">第二章</p>
-      <p class="ptitle">常用命令速查</p>
-      <p class="psub">整理中，敬请期待…</p>
-    </div>
-    <div class="pending-block">
-      <p class="pch">第三章</p>
-      <p class="ptitle">Shell 脚本与自动化</p>
-      <p class="psub">整理中，敬请期待…</p>
-    </div>
-    <div class="pending-block">
-      <p class="pch">第四章</p>
-      <p class="ptitle">终端工具链配置</p>
-      <p class="psub">整理中，敬请期待…</p>
-    </div>
-    <div class="pending-block">
-      <p class="pch">第五章</p>
-      <p class="ptitle">SSH 远程开发与服务器运维</p>
-      <p class="psub">整理中，敬请期待…</p>
-    </div>
-    <div class="pending-block">
-      <p class="pch">第六章</p>
-      <p class="ptitle">性能监控与调优</p>
-      <p class="psub">整理中，敬请期待…</p>
-    </div>
-    <div class="pending-block">
-      <p class="pch">第七章</p>
-      <p class="ptitle">Docker 基础与实践</p>
-      <p class="psub">整理中，敬请期待…</p>
+        </div>
+      </div>
     </div>
 
-  </article>
-</div><!-- end layout -->
+    <!-- ══ 待整理章节 ══ -->
+    <div class="chapter-pending">
+      <button class="chapter-header"><div><span class="ch-label">第二章</span><span class="ch-title">常用命令速查</span></div></button>
+      <p class="ch-pending-text">整理中，敬请期待…</p>
+    </div>
+    <div class="chapter-pending">
+      <button class="chapter-header"><div><span class="ch-label">第三章</span><span class="ch-title">Shell 脚本与自动化</span></div></button>
+      <p class="ch-pending-text">整理中，敬请期待…</p>
+    </div>
+    <div class="chapter-pending">
+      <button class="chapter-header"><div><span class="ch-label">第四章</span><span class="ch-title">终端工具链配置</span></div></button>
+      <p class="ch-pending-text">整理中，敬请期待…</p>
+    </div>
+    <div class="chapter-pending">
+      <button class="chapter-header"><div><span class="ch-label">第五章</span><span class="ch-title">SSH 远程开发与服务器运维</span></div></button>
+      <p class="ch-pending-text">整理中，敬请期待…</p>
+    </div>
+    <div class="chapter-pending">
+      <button class="chapter-header"><div><span class="ch-label">第六章</span><span class="ch-title">性能监控与调优</span></div></button>
+      <p class="ch-pending-text">整理中，敬请期待…</p>
+    </div>
+    <div class="chapter-pending">
+      <button class="chapter-header"><div><span class="ch-label">第七章</span><span class="ch-title">Docker 基础与实践</span></div></button>
+      <p class="ch-pending-text">整理中，敬请期待…</p>
+    </div>
+
+  </div>
+</div>
 
 <script>
-  // smooth scroll
-  function scrollTo(id) {
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
+(function() {
+  /* ── accordion toggle ── */
+  document.querySelectorAll('[data-toggle]').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const chapterId = this.dataset.toggle;
+      const chapter = document.querySelector(`.chapter[data-chapter="${chapterId}"]`);
+      const body = chapter.querySelector('.chapter-body');
+      const chevron = this.querySelector('.chevron');
+      const isOpen = body.classList.contains('open');
 
-  // active nav highlight
-  const navItems = document.querySelectorAll('.nav-item[data-target]');
-  const targets = Array.from(navItems).map(b => document.getElementById(b.dataset.target));
-
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        navItems.forEach(b => b.classList.remove('active'));
-        const btn = document.querySelector(`.nav-item[data-target="${entry.target.id}"]`);
-        if (btn) btn.classList.add('active');
+      if (isOpen) {
+        body.classList.remove('open');
+        if (chevron) chevron.classList.remove('open');
+      } else {
+        body.classList.add('open');
+        if (chevron) chevron.classList.add('open');
       }
     });
-  }, { rootMargin: '-15% 0px -70% 0px', threshold: 0 });
+  });
 
-  targets.forEach(el => { if (el) observer.observe(el); });
+  /* ── sidebar navigation ── */
+  document.querySelectorAll('.sidebar-sub, .sidebar-ch-title:not(.pending)').forEach(el => {
+    el.addEventListener('click', function() {
+      const chapterId = this.dataset.chapter;
+      const sectionId = this.dataset.section;
+
+      // expand the chapter if collapsed
+      if (chapterId) {
+        const chapter = document.querySelector(`.chapter[data-chapter="${chapterId}"]`);
+        if (chapter) {
+          const body = chapter.querySelector('.chapter-body');
+          const chevron = chapter.querySelector('.chevron');
+          if (body && !body.classList.contains('open')) {
+            body.classList.add('open');
+            if (chevron) chevron.classList.add('open');
+          }
+        }
+      }
+
+      // scroll to section
+      const targetId = sectionId || (chapterId ? document.querySelector(`[data-chapter="${chapterId}"] .section-h2`)?.id : null);
+      if (targetId) {
+        setTimeout(() => {
+          const target = document.getElementById(targetId);
+          if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+      }
+    });
+  });
+
+  /* ── scroll tracking: highlight active section in sidebar ── */
+  const allSubs = document.querySelectorAll('.sidebar-sub');
+  const sectionIds = Array.from(allSubs).map(el => el.dataset.section);
+
+  const observer = new IntersectionObserver((entries) => {
+    for (const entry of entries) {
+      if (entry.isIntersecting) {
+        allSubs.forEach(s => s.classList.remove('active'));
+        const active = document.querySelector(`.sidebar-sub[data-section="${entry.target.id}"]`);
+        if (active) active.classList.add('active');
+        break;
+      }
+    }
+  }, { rootMargin: '-15% 0px -75% 0px', threshold: 0 });
+
+  sectionIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) observer.observe(el);
+  });
+})();
 </script>
 
 </body>
