@@ -23,6 +23,7 @@ const noteTopics = [
 ]
 
 import Link from 'next/link'
+import TiltCard from './TiltCard'
 
 export default function Notes() {
   return (
@@ -39,26 +40,24 @@ export default function Notes() {
 
         <div className="grid sm:grid-cols-2 gap-5">
           {noteTopics.map((note) => (
-            <Link
-              key={note.title}
-              href={note.href}
-              className="bg-slate-800/50 border border-slate-700 rounded-2xl p-6 hover:border-slate-600 transition-colors group block"
-            >
-              <div className="flex items-center gap-3 mb-3">
-                <span className="text-2xl">{note.icon}</span>
-                <h3 className="text-white font-semibold">{note.title}</h3>
-              </div>
-              <p className="text-slate-400 text-sm leading-relaxed mb-4">{note.desc}</p>
-              <div className="flex flex-wrap gap-1.5">
-                {note.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="text-xs px-2 py-0.5 rounded bg-slate-700/60 text-slate-400 border border-slate-700 font-mono"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
+            <Link key={note.title} href={note.href} className="block">
+              <TiltCard max={6} className="bg-slate-800/50 border border-slate-700 rounded-2xl p-6 hover:border-slate-600 transition-colors group">
+                <div className="flex items-center gap-3 mb-3">
+                  <span className="text-2xl">{note.icon}</span>
+                  <h3 className="text-white font-semibold">{note.title}</h3>
+                </div>
+                <p className="text-slate-400 text-sm leading-relaxed mb-4">{note.desc}</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {note.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="text-xs px-2 py-0.5 rounded bg-slate-700/60 text-slate-400 border border-slate-700 font-mono"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </TiltCard>
             </Link>
           ))}
         </div>
