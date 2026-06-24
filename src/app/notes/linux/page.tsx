@@ -970,13 +970,13 @@ function Sidebar({ activeChapter, activeSection, onNav }: {
   return (
     <aside className="hidden lg:block w-56 shrink-0">
       <div className="sticky top-24 max-h-[calc(100vh-7rem)] overflow-y-auto pr-3">
-        <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">目录</p>
+        <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">目录</p>
         <nav className="space-y-3">
           {chapters.map((ch) => (
             <div key={ch.id}>
               <button
                 onClick={() => !ch.pending && onNav(ch.id)}
-                className={`w-full text-left px-2 py-1 rounded text-xs font-semibold transition-colors ${
+                className={`w-full text-left px-2 py-1 rounded text-sm font-semibold transition-colors ${
                   ch.pending
                     ? 'text-slate-600 cursor-default'
                     : activeChapter === ch.id
@@ -984,7 +984,7 @@ function Sidebar({ activeChapter, activeSection, onNav }: {
                       : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
                 }`}
               >
-                <span className={`font-mono text-[0.65rem] mr-1.5 ${activeChapter === ch.id ? 'text-blue-500' : 'text-slate-600'}`}>{ch.label}</span>
+                <span className={`font-mono text-[0.75rem] mr-1.5 ${activeChapter === ch.id ? 'text-blue-500' : 'text-slate-600'}`}>{ch.label}</span>
                 {ch.title}
               </button>
               {ch.sections.length > 0 && (
@@ -993,7 +993,7 @@ function Sidebar({ activeChapter, activeSection, onNav }: {
                     <button
                       key={s.id}
                       onClick={() => onNav(ch.id, s.id)}
-                      className={`w-full text-left pl-5 pr-2 py-0.5 rounded text-[0.75rem] transition-colors ${
+                      className={`w-full text-left pl-5 pr-2 py-0.5 rounded text-[0.8125rem] transition-colors ${
                         activeSection === s.id
                           ? 'text-blue-400 bg-blue-950/30'
                           : 'text-slate-500 hover:text-slate-300 hover:bg-slate-800/40'
